@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.oauth2.config.annotation.configurers.ClientDetailsServiceConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configuration.AuthorizationServerConfigurerAdapter;
@@ -29,8 +30,8 @@ public class OAuthConfig extends AuthorizationServerConfigurerAdapter {
     @Autowired
     private AuthenticationManager authenticationManager;
 
-    private BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-
+    @Autowired
+    private BCryptPasswordEncoder passwordEncoder;
 
     @Bean
     public JdbcTokenStore tokenStore() {
@@ -58,15 +59,5 @@ public class OAuthConfig extends AuthorizationServerConfigurerAdapter {
     public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
         clients.jdbc(dataSource)
                 .passwordEncoder(passwordEncoder);
-
-/* IT WORKED!
-Last login: Thu Sep 22 22:07:06 on console
-Notechus-MacBook-Pro:~ notechus$ curl
-curl: try 'curl --help' or 'curl --manual' for more information
-Notechus-MacBook-Pro:~ notechus$ curl my-client-with-secret:secret@localhost:9000/oauth/token -d grant_type=password -d username=spaulus -d password=password
-{"error":"invalid_grant","error_d
-Notechus-MacBook-Pro:~ notechus$ curl my-client-with-secret:secret@localhost:9000/oauth/token -d grant_type=client_credentials -d username=spaulus -d password=password
-{"access_token":"017ab0f4-0f44-4efb-8e38-6360ef231a86","token_type":"bearer","expires_in":3599,"scope":"read"}Notechus-MacBook-Pro:~ notechus$
- */
     }
 }
